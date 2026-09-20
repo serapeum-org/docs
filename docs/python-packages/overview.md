@@ -1,7 +1,10 @@
 # Serapeum
 
 ## Packages dependency
-![dependency](/docs/images/general/packages-dependency.jpg)
+
+See the **[dependency graph](dependency-graph.md)**, which is derived from what each package declares in its
+`pyproject.toml` and shows required dependencies, optional extras, and which extra of a dependency each one pulls.
+
 ## Top Level Functionality
 ![dependency](/docs/images/general/top-level-functionality.jpg)
 
