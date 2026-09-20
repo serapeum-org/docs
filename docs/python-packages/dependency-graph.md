@@ -3,8 +3,17 @@
 How the Serapeum Python packages depend on each other. Arrows read **"depends on"** — a package points at what it
 needs, so the foundation layers sit at the bottom and the applications at the top.
 
-- **Solid arrows** are required dependencies (`project.dependencies`).
-- **Dashed arrows** are optional — the label is the extra that pulls the package in, e.g. `pip install pyramids-gis[viz]`.
+Labels name the extra on **both** ends of a link:
+
+- **Solid arrows** are required dependencies (`project.dependencies`). A label is the extra the dependency is
+  installed with — `digital_earth -->|tiles| cleopatra` means `digitalearth` requires `cleopatra[tiles]`.
+- **Dashed arrows** are optional. The label reads `<extra on this package> → <extra requested on the dependency>`,
+  and the right-hand side is dropped when the dependency is requested plain. So `hapi -.->|inputs → ecmwf|
+  earthlens` means `pip install hapi-nile[inputs]` brings in `earthlens[ecmwf]`.
+- A dashed arrow **alongside** a solid one is an extra that *upgrades* a dependency you already have:
+  `digital-rivers` always needs `pyramids-gis`, and `digital-rivers[distributed]` swaps it for `pyramids-gis[lazy]`.
+- `dev`, `docs` and `notebooks` are PEP 735 dependency groups, not user-installable extras — they affect
+  contributors, not consumers. `·` separates several extras that produce the same link.
 
 ```mermaid
 graph TD
@@ -44,7 +53,7 @@ graph TD
     geostatista --> pyramids
     earthlens --> pyramids
     digital_earth --> pyramids
-    digital_earth --> cleopatra
+    digital_earth -->|tiles| cleopatra
     hapi --> pyramids
     hapi --> cleopatra
     hapi --> statista
@@ -56,19 +65,25 @@ graph TD
     hyd_models --> hapi
     hyd_models --> pyramids
 
-    %% ---- optional (extras) ----
-    pyramids -.->|viz| cleopatra
-    digital_rivers -.->|viz| cleopatra
-    geostatista -.->|viz| cleopatra
-    earthlens -.->|docs/dev| cleopatra
-    earthlens -.->|eedai| pyramids_eo
-    hapi -.->|inputs| earthlens
-    hyd_models -.->|inputs| earthlens
+    %% ---- optional: reached only through an extra ----
+    pyramids -.->|viz → tiles| cleopatra
+    digital_rivers -.->|viz → tiles| cleopatra
+    geostatista -.->|viz · dev/docs| cleopatra
+    earthlens -.->|dev/docs → tiles| cleopatra
+    earthlens -.->|eedai · dev/notebooks| pyramids_eo
+    hapi -.->|inputs → ecmwf| earthlens
+    hyd_models -.->|inputs → ecmwf| earthlens
     earthstudio -.->|gis| pyramids
     earthstudio -.->|gis| pyramids_eo
     earthstudio -.->|gis| geostatista
     earthstudio -.->|gis| digital_earth
     earthstudio -.->|agent| serapeum
+
+    %% ---- extras that upgrade an already-required dependency ----
+    pyramids_eo -.->|viz → viz| pyramids
+    digital_rivers -.->|viz → viz · distributed → lazy| pyramids
+    geostatista -.->|viz → viz · distributed → lazy| pyramids
+    earthlens -.->|stac → stac · nwm → parquet| pyramids
 
     classDef app fill:#fde8e8,stroke:#b03a3a,color:#4a1414
     classDef lib fill:#e6f0fb,stroke:#3a6ea5,color:#132a45
