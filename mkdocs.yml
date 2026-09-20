@@ -44,6 +44,7 @@ nav:
   - Home: index.md
   - Python Packages:
       - python-packages/overview.md
+      - Dependency graph: python-packages/dependency-graph.md
       - hydrological-modeling:
           - Hydrological model: python-packages/hydrological-modeling/hapi.md
           - Hydrodynamic model: python-packages/hydrological-modeling/serapis.md
@@ -108,7 +109,11 @@ markdown_extensions:
       generic: true
   - pymdownx.snippets:
       check_paths: true
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.highlight
